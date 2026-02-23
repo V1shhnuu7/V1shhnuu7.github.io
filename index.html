@@ -17,7 +17,6 @@
       --text:    #e8e8f0;
       --sub:     #b0b0c4;
       --muted:   #6b6b80;
-      /* ── fluid tokens ── */
       --nav-h:    58px;
       --pad-x:    clamp(1.2rem, 4vw, 4rem);
       --sec-y:    clamp(56px, 8vw, 88px);
@@ -34,13 +33,23 @@
       line-height: 1.6;
     }
 
-    /* ── prevent long words from breaking layout ── */
+    /* ── Noise texture overlay for depth ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.022;
+      pointer-events: none;
+      z-index: 0;
+    }
+
     p, .tl-desc, .project-desc, .about-text p, .hero-desc {
       overflow-wrap: anywhere;
     }
 
     /* ════════════════════════════════════
-       CURSOR GLOW  (desktop only)
+       CURSOR GLOW
     ════════════════════════════════════ */
     #cursor-glow {
       pointer-events: none;
@@ -157,11 +166,11 @@
       .reveal { opacity: 1; transform: none; transition: none; }
     }
 
-    /* ════════════════════════════════════
-       HERO
+    /* ══════════════════════════��═════════
+       HERO  — FIXED CENTERING
     ════════════════════════════════════ */
     .hero {
-      min-height: 100svh; /* modern mobile viewport */
+      min-height: 100svh;
       display: grid;
       place-items: center;
       padding: var(--nav-h) var(--pad-x) 4rem;
@@ -189,7 +198,18 @@
       pointer-events: none;
       z-index: 0;
     }
-    .hero-inner { position: relative; max-width: 860px; z-index: 1; }
+
+    /* ── FIX: hero-inner is properly centered ── */
+    .hero-inner {
+      position: relative;
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto;       /* ← ensures centering inside grid cell */
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;  /* ← children (h1, desc, btns) all center-align */
+    }
 
     .hero-tag {
       display: inline-flex;
@@ -210,6 +230,8 @@
       background: var(--accent);
       animation: pulse 2s ease-in-out infinite;
     }
+
+    /* ── Gradient shimmer on hero name ── */
     .hero h1 {
       font-family: 'Syne', sans-serif;
       font-weight: 800;
@@ -217,8 +239,24 @@
       line-height: 0.93;
       letter-spacing: -0.045em;
       margin-bottom: 1.4rem;
+      text-align: center;         /* ← explicit center on all viewports */
+      width: 100%;
+      background: linear-gradient(135deg, var(--text) 0%, var(--text) 40%, var(--accent) 60%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200% 200%;
+      animation: shimmer 6s ease-in-out infinite alternate;
     }
-    .hero h1 .line2 { color: var(--accent); }
+    @keyframes shimmer {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    /* line2 overrides — keep accent for PEJATHAYA */
+    .hero h1 .line2 {
+      display: block;
+    }
 
     .hero-desc {
       font-size: clamp(0.85rem, 2vw, 0.95rem);
@@ -226,6 +264,7 @@
       line-height: 1.8;
       max-width: 540px;
       margin: 0 auto 2.4rem;
+      text-align: center;
     }
     .hero-btns {
       display: flex;
@@ -241,7 +280,7 @@
       justify-content: center;
       gap: 0.4rem;
       padding: 0.75rem 1.6rem;
-      min-height: 44px; /* touch target */
+      min-height: 44px;
       border-radius: 6px;
       font-family: 'DM Mono', monospace;
       font-size: 0.8rem;
@@ -252,7 +291,7 @@
       border: none;
     }
     .btn-primary { background: var(--accent); color: #0a0a0f; font-weight: 600; }
-    .btn-primary:hover { background: #9affb0; transform: translateY(-2px); }
+    .btn-primary:hover { background: #9affb0; transform: translateY(-2px); box-shadow: 0 0 18px rgba(127,255,110,0.3); }
     .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border2); }
     .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
 
@@ -294,11 +333,17 @@
     }
     .about-text p strong { color: var(--text); font-weight: 500; }
 
+    /* ── Hobbies card with glow on hover ── */
     .hobbies-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 1.4rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .hobbies-card:hover {
+      border-color: rgba(127,255,110,0.35);
+      box-shadow: 0 0 22px rgba(127,255,110,0.07);
     }
     .hobbies-card-title {
       font-size: 0.68rem;
@@ -313,25 +358,26 @@
       gap: 0.8rem;
       padding: 0.62rem 0;
       border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
     }
     .hobby-row:last-child { border-bottom: none; }
+    .hobby-row:hover { background: rgba(127,255,110,0.025); border-radius: 6px; padding-left: 0.3rem; }
+
+    /* ── Emoji icons for hobbies ── */
     .hobby-icon {
-      width: 32px; height: 32px;
-      border-radius: 6px;
+      width: 36px; height: 36px;
+      border-radius: 8px;
       background: var(--surface);
       border: 1px solid var(--border2);
       display: grid;
       place-items: center;
-      font-size: 0.75rem;
-      color: var(--accent);
+      font-size: 1.1rem;        /* emoji size */
       flex-shrink: 0;
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
     }
     .hobby-name { font-size: 0.83rem; color: var(--text); }
     .hobby-sub  { font-size: 0.72rem; color: var(--muted); margin-top: 0.1rem; }
 
-    /* ════════════════════════════════════
+    /* ═════════════════════════��══════════
        SKILLS
     ════════════════════════════════════ */
     .skills-grid {
@@ -344,9 +390,13 @@
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 1.3rem 1.4rem;
-      transition: border-color 0.2s, transform 0.2s;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
-    .skill-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+    .skill-card:hover {
+      border-color: var(--border2);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
     .skill-card.learning { border-color: rgba(110,170,255,0.22); }
     .skill-label {
       font-family: 'Syne', sans-serif;
@@ -440,7 +490,7 @@
     }
 
     /* ════════════════════════════════════
-       TIMELINE (Experience & Education)
+       TIMELINE
     ════════════════════════════════════ */
     .timeline { position: relative; padding-left: 1.5rem; }
     .timeline::before {
@@ -545,11 +595,9 @@
       min-height: 44px;
       color: var(--text);
       font-family: 'DM Mono', monospace;
-      font-size: 0.82rem;
+      font-size: max(0.82rem, 16px);
       outline: none;
       transition: border-color 0.2s;
-      /* prevent iOS zoom on focus */
-      font-size: max(0.82rem, 16px);
     }
     .form-input:focus { border-color: rgba(127,255,110,0.4); }
     .form-input::placeholder { color: var(--muted); }
@@ -582,7 +630,7 @@
 
     /* ════════════════════════════════════
        ANIMATIONS
-    ════════════════════════════════════ */
+    ════════════════════════════════��═══ */
     @keyframes pulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.35; }
@@ -617,7 +665,7 @@
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-44deg); }
 
     /* ════════════════════════════════════
-       MOBILE DRAWER  — animated
+       MOBILE DRAWER
     ════════════════════════════════════ */
     .mobile-nav {
       position: fixed;
@@ -629,11 +677,10 @@
       z-index: 190;
       flex-direction: column;
       gap: 0;
-      /* hidden by default */
       opacity: 0;
       transform: translateY(-6px);
       pointer-events: none;
-      display: flex;           /* keep flex, control visibility via opacity */
+      display: flex;
       transition: opacity 0.22s ease, transform 0.22s ease;
     }
     .mobile-nav.open {
@@ -672,7 +719,7 @@
     .mobile-nav .mob-cta:hover { padding-left: 0.4rem; opacity: 0.88; }
 
     /* ════════════════════════════════════
-       TABLET  ≤ 900px
+       TABLET ≤ 900px
     ════════════════════════════════════ */
     @media (max-width: 900px) {
       .skills-grid { grid-template-columns: repeat(2, 1fr); }
@@ -680,14 +727,18 @@
     }
 
     /* ════════════════════════════════════
-       PHABLET  ≤ 700px
+       PHABLET ≤ 700px
     ════════════════════════════════════ */
     @media (max-width: 700px) {
       .nav-links { display: none; }
       .hamburger { display: flex; }
 
       .hero { padding-top: calc(var(--nav-h) + 2rem); min-height: 100svh; }
-      .hero h1 { font-size: clamp(2.6rem, 13vw, 4.2rem); }
+      .hero h1 {
+        font-size: clamp(2.6rem, 13vw, 4.2rem);
+        text-align: center;   /* ← explicit mobile center */
+        width: 100%;
+      }
 
       .hero-btns { flex-direction: column; align-items: stretch; }
       .hero-btns .btn { width: 100%; }
@@ -712,21 +763,24 @@
 
       .section-title { margin-bottom: 1.8rem; }
 
-      /* cursor glow off on touch */
       #cursor-glow { display: none; }
     }
 
     /* ════════════════════════════════════
-       SMALL PHONES  ≤ 480px
+       SMALL PHONES ≤ 480px
     ════════════════════════════════════ */
     @media (max-width: 480px) {
       .skills-grid { grid-template-columns: 1fr; }
       .skill-card.learning { grid-column: span 1; }
-      .hero h1 { font-size: clamp(2.2rem, 14vw, 3.2rem); }
+      .hero h1 {
+        font-size: clamp(2.2rem, 14vw, 3.2rem);
+        text-align: center;
+        width: 100%;
+      }
     }
 
     /* ════════════════════════════════════
-       TINY PHONES  ≤ 380px
+       TINY PHONES ≤ 380px
     ════════════════════════════════════ */
     @media (max-width: 380px) {
       .hero-tag { font-size: 0.6rem; padding: 0.28rem 0.75rem; }
@@ -836,31 +890,39 @@
         <div class="hobbies-card">
           <div class="hobbies-card-title">Interests &amp; Hobbies</div>
           <div class="hobby-row">
-            <div class="hobby-icon">01</div>
+            <div class="hobby-icon">🎮</div>
             <div>
               <div class="hobby-name">Gaming</div>
               <div class="hobby-sub">Single player &amp; strategy games</div>
             </div>
           </div>
           <div class="hobby-row">
-            <div class="hobby-icon">02</div>
+            <div class="hobby-icon">🎵</div>
             <div>
               <div class="hobby-name">Music &amp; Orchestra</div>
               <div class="hobby-sub">Film scores, classical &amp; orchestral</div>
             </div>
           </div>
           <div class="hobby-row">
-            <div class="hobby-icon">03</div>
+            <div class="hobby-icon">🎬</div>
             <div>
               <div class="hobby-name">Movies &amp; Series</div>
               <div class="hobby-sub">Good storytelling across genres</div>
             </div>
           </div>
           <div class="hobby-row">
-            <div class="hobby-icon">04</div>
+            <div class="hobby-icon">📚</div>
             <div>
               <div class="hobby-name">Comics</div>
               <div class="hobby-sub">Manga, graphic novels &amp; webtoons</div>
+            </div>
+          </div>
+          <!-- NEW: Workout & Exercise -->
+          <div class="hobby-row">
+            <div class="hobby-icon">🏋️</div>
+            <div>
+              <div class="hobby-name">Workout &amp; Exercise</div>
+              <div class="hobby-sub">Gym, calisthenics &amp; staying active</div>
             </div>
           </div>
         </div>
@@ -1151,143 +1213,4 @@
             srivishnupejathaya127@gmail.com
           </a>
           <a href="https://github.com/V1shhnuu7" target="_blank" rel="noopener" class="contact-item">
-            <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.23 1.83 1.23 1.07 1.83 2.8 1.3 3.48 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
-            github.com/V1shhnuu7
-          </a>
-          <a href="https://www.linkedin.com/in/srivishnu-pejathaya-1bb9b5325" target="_blank" rel="noopener" class="contact-item">
-            <svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.37V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45C23.2 24 24 23.23 24 22.27V1.73C24 .77 23.2 0 22.22 0z"/></svg>
-            linkedin.com/in/srivishnu-pejathaya
-          </a>
-        </div>
-      </div>
-      <div class="reveal">
-        <form id="contact-form" action="https://formspree.io/f/xdalpaqr" method="POST" class="form-wrap">
-          <div class="form-row-2">
-            <div class="form-field">
-              <label class="form-lbl" for="f-name">Name</label>
-              <input id="f-name" type="text" name="name" class="form-input" placeholder="Your name" required />
-            </div>
-            <div class="form-field">
-              <label class="form-lbl" for="f-email">Email</label>
-              <input id="f-email" type="email" name="email" class="form-input" placeholder="your@email.com" required />
-            </div>
-          </div>
-          <div class="form-field">
-            <label class="form-lbl" for="f-subject">Subject</label>
-            <input id="f-subject" type="text" name="subject" class="form-input" placeholder="What's this about?" required />
-          </div>
-          <div class="form-field">
-            <label class="form-lbl" for="f-msg">Message</label>
-            <textarea id="f-msg" name="message" class="form-input" placeholder="Your message…" rows="5" required></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary" style="align-self:flex-start;">Send Message</button>
-          <div class="form-success" id="form-success">✓ Message sent — I'll get back to you soon!</div>
-        </form>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <p class="footer-text">© 2025 Srivishnu Pejathaya — Built with ☕ and focus.</p>
-  <div class="footer-links">
-    <a href="#about">About</a>
-    <a href="#projects">Projects</a>
-    <a href="#contact">Contact</a>
-  </div>
-</footer>
-
-<script>
-  /* ── Scroll reveal ── */
-  const revealEls = document.querySelectorAll('.reveal');
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-            e.target.classList.add('visible');
-            io.unobserve(e.target);
-          }
-      });
-    }, { threshold: 0.12 });
-    revealEls.forEach(el => io.observe(el));
-  } else {
-    revealEls.forEach(el => el.classList.add('visible'));
-  }
-
-  /* ── Hamburger ── */
-  const ham = document.getElementById('hamburger');
-  const mobileNav = document.getElementById('mobile-nav');
-  ham.addEventListener('click', () => {
-    const open = ham.classList.toggle('open');
-    mobileNav.classList.toggle('open', open);
-    ham.setAttribute('aria-expanded', open);
-    document.body.classList.toggle('nav-open', open);
-  });
-  mobileNav.querySelectorAll('a').forEach(a => {
-    a.addEventListener('click', () => {
-      ham.classList.remove('open');
-      mobileNav.classList.remove('open');
-      ham.setAttribute('aria-expanded', false);
-      document.body.classList.remove('nav-open');
-    });
-  });
-
-  /* ── Cursor glow ── */
-  const glow = document.getElementById('cursor-glow');
-  if (window.matchMedia('(pointer: fine)').matches) {
-    glow.style.opacity = '1';
-    document.addEventListener('mousemove', e => {
-      glow.style.left = e.clientX + 'px';
-      glow.style.top  = e.clientY + 'px';
-    });
-  }
-
-  /* ── Active nav on scroll ── */
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.nav-links a');
-  const onScroll = () => {
-    let cur = '';
-    sections.forEach(s => {
-      if (window.scrollY >= s.offsetTop - 80) cur = s.id;
-    });
-    navLinks.forEach(a => {
-      a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
-    });
-  };
-  window.addEventListener('scroll', onScroll, { passive: true });
-
-  /* ── Contact form ── */
-  const form = document.getElementById('contact-form');
-  const successMsg = document.getElementById('form-success');
-  if (form) {
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      const btn = form.querySelector('button[type="submit"]');
-      btn.textContent = 'Sending…';
-      btn.disabled = true;
-      try {
-        const res = await fetch(form.action, {
-          method: 'POST',
-          body: new FormData(form),
-          headers: { 'Accept': 'application/json' }
-        });
-        if (res.ok) {
-          form.reset();
-          successMsg.style.display = 'block';
-          btn.textContent = 'Send Message';
-          btn.disabled = false;
-        } else {
-          btn.textContent = 'Error — try again';
-          btn.disabled = false;
-        }
-      } catch (err) {
-        console.error('Form submission error:', err);
-        btn.textContent = 'Error — try again';
-        btn.disabled = false;
-      }
-    });
-  }
-</script>
-</body>
-</html>
+            <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.08-.73.08-.73 
